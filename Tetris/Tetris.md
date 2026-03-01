@@ -2,7 +2,7 @@
 
 A fully functional Tetris clone built in **C** with **ncurses**, featuring a clean modern aesthetic in the terminal. Developed in three progressive versions, each building on top of the last.
 
-> Reference: [Brennan Colberg's Tetris tutorial](https://github.com/brennancolberg/tetris)
+> Reference: [Brennan Colberg's Tetris tutorial]([https://github.com/brennancolberg/tetris](https://github.com/brenns10/tetris))
 
 ------
 
