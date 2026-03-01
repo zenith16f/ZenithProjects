@@ -1,0 +1,177 @@
+# ============================================================
+# .gitignore — Repositorio multi-proyecto
+# Cubre: C, C#, TypeScript/Node.js, Python, y herramientas comunes
+# ============================================================
+
+# ============================================================
+# BINARIOS Y COMPILADOS (C / C++)
+# ============================================================
+*.o             # Object files
+*.a             # Static libraries
+*.so            # Shared libraries (Linux)
+*.out           # Salida de compilación genérica
+*.exe           # Windows executables
+
+# Ejecutables sin extensión (Linux) — excluir carpetas src/ y similares
+# Agrega los nombres de tus binarios aquí conforme los creas:
+tetris
+password-manager
+
+# ============================================================
+# C# / .NET
+# ============================================================
+bin/
+obj/
+*.user
+*.suo
+*.vs/
+.vs/
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+**/Properties/launchSettings.json
+
+# ============================================================
+# NODE.JS / TYPESCRIPT
+# ============================================================
+node_modules/
+dist/
+build/
+*.js.map
+*.d.ts.map
+
+# Variables de entorno — NUNCA subir al repo
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Logs de npm/yarn/pnpm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Cache
+.npm/
+.yarn/
+.cache/
+.parcel-cache/
+.turbo/
+
+# ============================================================
+# PYTHON
+# ============================================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.whl
+MANIFEST
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ============================================================
+# DATOS SENSIBLES (aplica a gestor de contraseñas y cualquier app)
+# ============================================================
+*.db            # Bases de datos SQLite
+*.sqlite
+*.sqlite3
+*.key           # Llaves privadas
+*.pem
+*.p12
+*.pfx
+*.vault         # Archivos de vault cifrados (si decides nombrarlos así)
+secrets/        # Carpeta de secretos
+config/local.*  # Configuraciones locales
+
+# ============================================================
+# EDITORES Y IDES
+# ============================================================
+
+# VS Code
+.vscode/
+!.vscode/extensions.json   # Este sí es útil compartir (recomendaciones del equipo)
+
+# JetBrains (CLion, Rider, WebStorm)
+.idea/
+*.iml
+*.iws
+cmake-build-*/
+
+# Vim / Neovim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+\#*\#
+.\#*
+
+# ============================================================
+# SISTEMA OPERATIVO
+# ============================================================
+
+# Linux
+.directory
+.Trash-*
+
+# macOS (por si algún día usas uno)
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows (por compatibilidad con otros colaboradores)
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ============================================================
+# HERRAMIENTAS DE BUILD
+# ============================================================
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile.conan
+compile_commands.json   # Útil localmente, no necesario en repo
+
+# ============================================================
+# LOGS Y TEMPORALES
+# ============================================================
+*.log
+*.tmp
+*.temp
+tmp/
+temp/
