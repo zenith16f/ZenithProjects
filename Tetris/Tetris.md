@@ -99,9 +99,14 @@ make run
 
 | Key     | Action            |
 | ------- | ----------------- |
-| `←` `→` `a` `d` | Move left / right |
-| `↓` `s`     | Soft drop         |
-| `↑` `w`     | Rotate            |
+| `←` `→` | Move left / right |
+| `a` `d` | Move left / right |
+| `↓`     | Soft drop         |
+| `s`     | Soft drop         |
+| `↑`     | Rotate            |
+| `w`     | Rotate            |
+| `c`     | Hold              |
+| `SPC`   | Hard Drop         |
 | `q`     | Quit              |
 
 ------
