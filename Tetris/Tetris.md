@@ -66,22 +66,16 @@ Game logic and rendering are completely decoupled — `tetris.c` knows nothing a
 
 ## ✅ What's done so far
 
-### Version 1
+### Version 2.0
 
--  Project structure with header files and Makefile
--  ncurses initialization and teardown
--  Game board representation
--  Tetromino definitions as coordinate offset arrays
--  Tetromino spawning and randomization
--  Rendering loop (board + active piece + UI panels)
--  Gravity timer system
--  Left / right movement with collision detection
--  Clockwise rotation with collision detection
--  Piece locking on landing
--  Line clearing logic
--  Score tracking
--  Next piece preview panel
--  Game over screen
+- Tiling Manager Problem solved
+- Blocked the mouse when playing
+- Ghost Piece
+- Improved Scoring system
+- Lock Delay
+- Arra-Based Gravity
+- Hold piece panel
+- UI small improves
 
 ------
 
@@ -105,13 +99,13 @@ make run
 
 | Key     | Action            |
 | ------- | ----------------- |
-| `←` `→` | Move left / right |
-| `↓`     | Soft drop         |
-| `↑`     | Rotate            |
+| `←` `→` `a` `d` | Move left / right |
+| `↓` `s`     | Soft drop         |
+| `↑` `w`     | Rotate            |
 | `q`     | Quit              |
 
 ------
 
 ## 📜 License
 
-MIT	
+MIT

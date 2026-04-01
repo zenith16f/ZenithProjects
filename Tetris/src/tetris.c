@@ -1,8 +1,8 @@
 /*
  * Tetris Game
  * Author: zenith16f
- * Version: 1.0
- * Version Name: Functional
+ * Version: 1.5
+ * Version Name: Evo to 2.0
  * File: tetris.c
  */
 
@@ -14,17 +14,25 @@
 #include <time.h>
 
 // Defines
-#define GRAVITY_BASE 30
-#define GRAVITY_MIN 5
+#define GRAVITY_TABLE_SIZE 15
 
 #define SCORE_1_LINE 100
 #define SCORE_2_LINE 300
 #define SCORE_3_LINE 500
-#define SCORE_4_LINE 800 // Tetris -> 4 lineas a la vez
+#define SCORE_4_LINE 800
+#define SCORE_BACK_TO_BACK_BONUS 1200
+#define SCORE_SOFT_DROP 1
+#define SCORE_HARD_DROP 2
 
 #define LINES_PER_LEVEL 10
 
 // Arrays
+// Gravity
+static const int GRAVITY_TABLE[] = {
+    /*  nv1  nv2  nv3  nv4  nv5  nv6  nv7  nv8  nv9 */
+    48, 43, 38, 33, 28, 23, 18, 13, 8,
+    /*  nv10 nv11 nv12 nv13 nv14 nv15 */
+    6, 5, 5, 4, 3, 2};
 // Tetrominos
 static const int PIECES[PIECE_COUNT][4][4][2] =
     {
@@ -87,17 +95,21 @@ static const int PIECES[PIECE_COUNT][4][4][2] =
 
 // Functions
 static int GetGravity(int level) {
-  int gravity = GRAVITY_BASE - (level * 3); // Restar 3 ticks por nivel
-  return gravity < GRAVITY_MIN ? GRAVITY_MIN
-                               : gravity; // No retornar menos que el minimo
+  int index = level - 1;
+  if (index < 0)
+    index = 0;
+
+  if (index >= GRAVITY_TABLE_SIZE)
+    index = GRAVITY_TABLE_SIZE - 1;
+  return GRAVITY_TABLE[index];
 }
 
 static TetrisPiece RandomPiece() {
   TetrisPiece piece;
-  piece.type = rand() % PIECE_COUNT; // Tipo aleatorio de pieza
-  piece.rotation = 0;                // Sin rotacion
-  piece.row = 0;                     // Fila superior
-  piece.col = BOARD_WIDTH / 2 - 1;   // Centrada horizontalmente
+  piece.type = rand() % PIECE_COUNT;
+  piece.rotation = 0;
+  piece.row = 0;
+  piece.col = BOARD_WIDTH / 2 - 1;
   return piece;
 }
 
@@ -105,8 +117,8 @@ void TetrisGameGetPieceCoords(TetrisGame *game __attribute__((unused)),
                               TetrisPiece *piece, int coord[4][2]) {
   const int (*offset)[2] = PIECES[piece->type][piece->rotation];
   for (int i = 0; i < 4; i++) {
-    coord[i][0] = piece->row + offset[i][0]; // Fila de la pieza + offset
-    coord[i][1] = piece->col + offset[i][1]; // Columna de la pieza + offset
+    coord[i][0] = piece->row + offset[i][0];
+    coord[i][1] = piece->col + offset[i][1];
   }
 }
 
@@ -153,7 +165,7 @@ static int CheckLines(TetrisGame *game) {
     bool full = true;
     for (int c = 0; c < BOARD_WIDTH; c++) {
       if (game->board[r][c] == 0) {
-        full = false; // Existe un hueco -> Fila no completa
+        full = false;
         break;
       }
     }
@@ -178,10 +190,18 @@ static int CheckLines(TetrisGame *game) {
 static void AdjustScore(TetrisGame *game, int lines) {
   int points[] = {0, SCORE_1_LINE, SCORE_2_LINE, SCORE_3_LINE, SCORE_4_LINE};
 
-  if (lines > 0 && lines <= 4)
-    game->score += points[lines] * game->level;
-  game->linesCleared += lines;
+  if (lines > 0 && lines <= 4) {
+    int base = points[lines];
 
+    if (lines == 4 && game->lastWasTetris) {
+      base = SCORE_BACK_TO_BACK_BONUS;
+    }
+
+    game->score += base * game->level;
+    game->lastWasTetris = (lines == 4);
+  }
+
+  game->linesCleared += lines;
   game->level = (game->linesCleared / LINES_PER_LEVEL) + 1;
 }
 
@@ -211,10 +231,13 @@ static void HandleRotate(TetrisGame *game) {
 }
 
 static void HardDrop(TetrisGame *game) {
+  int cellsDropped = 0;
   while (TetrisGameIsValid(game, &game->current, game->current.row + 1,
                            game->current.col, game->current.rotation)) {
     game->current.row++;
+    cellsDropped++;
   }
+  game->score += cellsDropped * SCORE_HARD_DROP;
 
   LandPiece(game);
   int lines = CheckLines(game);
@@ -233,25 +256,27 @@ static void HandleHold(TetrisGame *game) {
 
   if (!game->hasHeld) {
     game->held = game->current;
+    game->held.row = 0;
+    game->held.col = 0;
+    game->held.rotation = 0;
     game->hasHeld = true;
 
     if (!SpawnNext(game))
       game->gameOver = true;
   } else {
-    // Swap held and current pieces
+
     TetrisPiece temporal = game->held;
     game->held = game->current;
-    game->current = temporal;
+    game->held.row = 0;
+    game->held.col = 0;
+    game->held.rotation = 0;
 
-    // Reset position of playing piece
+    game->current = temporal;
     game->current.row = 0;
     game->current.col = BOARD_WIDTH / 2 - 1;
     game->current.rotation = 0;
   }
 
-  game->held.row = 0;
-  game->held.col = 0;
-  game->held.rotation = 0;
   game->canHold = false;
 }
 
@@ -294,7 +319,7 @@ bool TetrisGameTick(TetrisGame *game, TetrisMove move) {
     if (TetrisGameIsValid(game, &game->current, game->current.row + 1,
                           game->current.col, game->current.rotation)) {
       game->current.row++;
-      game->score++;
+      game->score += SCORE_SOFT_DROP;
     };
     break;
   case MOVE_ROTATE:
@@ -339,3 +364,5 @@ bool TetrisGameTick(TetrisGame *game, TetrisMove move) {
 
   return true;
 }
+
+// Get Ghost Row

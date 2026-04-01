@@ -1,10 +1,11 @@
 /*
  * Tetris Game
  * Author: zenith16f
- * Version: 1.0
- * Version Name: Functional
+ * Version: 1.5
+ * Version Name: Evo to 2.0
  * File: tetris.h
  */
+
 #ifndef TETRIS_H
 #define TETRIS_H
 
@@ -41,35 +42,39 @@ typedef enum {
 
 // Pieces
 typedef struct {
-    PieceType type;
-    int rotation; // rotacion actual 0 1 2 3
-    int row;
-    int col;
+  PieceType type;
+  int rotation;
+  int row;
+  int col;
 } TetrisPiece;
 
 // Complete Game
 typedef struct {
-    int board[BOARD_HEIGHT][BOARD_WIDTH]; // Tablero 0 = vacio, 1-7 = color de pieza aterrizada
+  int board[BOARD_HEIGHT][BOARD_WIDTH];
 
-    TetrisPiece current; // Pieza cayendo actualmente
-    TetrisPiece next;  // Siguiente pieza preview
-    TetrisPiece held; // Pieza guardada
+  TetrisPiece current;
+  TetrisPiece next;
+  TetrisPiece held;
 
-    bool hasHeld;  // Existe pieza guardada?
-    bool canHold;  // Puede guardar una pieza?
+  bool hasHeld;
+  bool canHold;
 
-    int score;
-    int level;
-    int linesCleared;
+  int score;
+  int level;
+  int linesCleared;
 
-    int gravityTimer; // Contador, al llegar a 0 -> la pieza baja
-    bool gameOver;
+  int gravityTimer;
+  bool gameOver;
+  bool lastWasTetris;
 } TetrisGame;
 
 // Public Functions
+int TetrisGameGetGhostRow(TetrisGame *game);
 void TetrisGameInit(TetrisGame *game);
 bool TetrisGameTick(TetrisGame *game, TetrisMove move);
-void TetrisGameGetPieceCoords(TetrisGame *game, TetrisPiece *piece, int coord[4][2]);
-bool TetrisGameIsValid(TetrisGame *game, TetrisPiece *piece, int row, int col, int rot);
+void TetrisGameGetPieceCoords(TetrisGame *game, TetrisPiece *piece,
+                              int coord[4][2]);
+bool TetrisGameIsValid(TetrisGame *game, TetrisPiece *piece, int row, int col,
+                       int rot);
 
 #endif

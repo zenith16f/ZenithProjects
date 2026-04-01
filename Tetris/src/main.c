@@ -1,3 +1,11 @@
+/*
+ * Tetris Game
+ * Author: zenith16f
+ * Version: 1.5
+ * Version Name: Evo to 2.0
+ * File: main.c
+ */
+
 // Includes
 #include "tetris.h"
 #include <ncurses.h>
@@ -11,19 +19,21 @@
 #define BOARD_ORIGIN_ROW 1
 #define BOARD_ORIGIN_COL 2
 #define PANEL_COL (BOARD_ORIGIN_COL + BOARD_WIDTH * BLOCK_WIDTH + 2)
-#define TICK_MS 50 // 50 Milisegundos
+#define TICK_MS 50
 
 // Colors
-#define COLOR_PAIR_I 1 /* Pieza I — cyan    */
-#define COLOR_PAIR_O 2 /* Pieza O — amarillo */
-#define COLOR_PAIR_T 3 /* Pieza T — magenta  */
-#define COLOR_PAIR_S 4 /* Pieza S — verde    */
-#define COLOR_PAIR_Z 5 /* Pieza Z — rojo     */
-#define COLOR_PAIR_J 6 /* Pieza J — azul     */
-#define COLOR_PAIR_L 7 /* Pieza L — naranja (blanco en terminales básicos) */
-#define COLOR_PAIR_BORDER 8 /* Bordes del tablero — blanco sobre negro */
-#define COLOR_PAIR_TEXT 9   /* Texto del panel    — blanco sobre negro */
-#define COLOR_PAIR_EMPTY 10 /* Celda vacía        — negro sobre negro  */
+#define COLOR_PAIR_I 1
+#define COLOR_PAIR_O 2
+#define COLOR_PAIR_T 3
+#define COLOR_PAIR_S 4
+#define COLOR_PAIR_Z 5
+#define COLOR_PAIR_J 6
+#define COLOR_PAIR_L 7
+#define COLOR_PAIR_BORDER 8
+#define COLOR_PAIR_TEXT 9
+#define COLOR_PAIR_EMPTY 10
+#define COLOR_PAIR_GHOST 11 /* Ghost piece     — gris oscuro   */
+#define COLOR_PAIR_DIM 12   /* Hold deshabilitado — texto grisaceo   */
 
 // Functions
 static void InitColors(void) {
@@ -40,19 +50,23 @@ static void InitColors(void) {
   init_pair(COLOR_PAIR_BORDER, COLOR_WHITE, COLOR_BLACK);
   init_pair(COLOR_PAIR_TEXT, COLOR_WHITE, COLOR_BLACK);
   init_pair(COLOR_PAIR_EMPTY, COLOR_BLACK, COLOR_BLACK);
+
+  init_pair(COLOR_PAIR_GHOST, COLOR_WHITE, COLOR_BLACK);
+  init_pair(COLOR_PAIR_DIM, COLOR_WHITE, COLOR_BLACK);
 }
 
 static void InitCurses(void) {
   initscr();
   cbreak();
   noecho();
-  keypad(stdscr, TRUE); // Habilitar teclas especiales (flechas)
-  timeout(TICK_MS);           // Control de velocidad
+  keypad(stdscr, TRUE);
+  timeout(TICK_MS);
+  mousemask(0, NULL);
   curs_set(0);
 
   if (!has_colors()) {
     endwin();
-    fprintf(stderr, "ERROR: El terminal no soporta colores.\n");
+    fprintf(stderr, "ERROR: La terminal no soporta colores.\n");
     exit(1);
   }
   InitColors();
@@ -80,9 +94,9 @@ static int PieceColorPair(int typePlusOne) {
 }
 
 static void DrawBlock(int termRow, int termCol, int colorPair) {
-  attron(COLOR_PAIR(colorPair)); // Activar color
+  attron(COLOR_PAIR(colorPair));
   mvprintw(termRow, termCol, "  ");
-  attroff(COLOR_PAIR(colorPair)); // Desactivar color
+  attroff(COLOR_PAIR(colorPair));
 }
 
 static void DrawBorder(void) {
@@ -95,8 +109,8 @@ static void DrawBorder(void) {
 
   for (int r = 0; r < BOARD_HEIGHT; r++) {
     mvprintw(BOARD_ORIGIN_ROW + r, BOARD_ORIGIN_COL - 1, "|");
-    mvprintw(BOARD_ORIGIN_ROW + r, + BOARD_ORIGIN_COL + BOARD_WIDTH * BLOCK_WIDTH,
-             "|");
+    mvprintw(BOARD_ORIGIN_ROW + r,
+             +BOARD_ORIGIN_COL + BOARD_WIDTH * BLOCK_WIDTH, "|");
   }
   attroff(COLOR_PAIR(COLOR_PAIR_BORDER));
 }
@@ -157,12 +171,55 @@ static void DrawNextPiece(TetrisGame *game) {
     int r = coords[i][0];
     int c = coords[i][1];
 
-    if (r < 0 || r >= BOARD_HEIGHT || c < 0 || c >= BOARD_WIDTH)
+    if (r < 0 || r >= 4 || c < 0 || c >= 4)
       continue;
 
     int termRow = 5 + r;
     int termCol = PANEL_COL + c * BLOCK_WIDTH;
     DrawBlock(termRow, termCol, color);
+  }
+}
+
+static void DrawHoldPiece(TetrisGame *game) {
+  attron(COLOR_PAIR(COLOR_PAIR_TEXT));
+  mvprintw(10, PANEL_COL, "Guardada:");
+  if (!game->canHold && game->hasHeld) {
+    mvprintw(10, PANEL_COL + 10, "[--]");
+  } else
+    mvprintw(10, PANEL_COL + 10, "    ");
+  attroff(COLOR_PAIR(COLOR_PAIR_TEXT));
+
+  if (!game->hasHeld)
+    return;
+
+  TetrisPiece preview = game->held;
+  preview.row = 0;
+  preview.col = 0;
+
+  int coords[4][2];
+  TetrisGameGetPieceCoords(game, &preview, coords);
+
+  int color =
+      game->canHold ? PieceColorPair(game->held.type + 1) : COLOR_PAIR_DIM;
+
+  for (int i = 0; i < 4; i++) {
+    int r = coords[i][0];
+    int c = coords[i][1];
+
+    if (r < 0 || r >= 4 || c < 0 || c >= 4)
+      continue;
+
+    int termRow = 12 + r;
+    int termCol = PANEL_COL + c * BLOCK_WIDTH;
+
+    if (!game->canHold) {
+      /* Atenuado: activar A_DIM antes de dibujar */
+      attron(A_DIM);
+      DrawBlock(termRow, termCol, color);
+      attroff(A_DIM);
+    } else {
+      DrawBlock(termRow, termCol, color);
+    }
   }
 }
 
@@ -172,30 +229,38 @@ static void DrawPanel(TetrisGame *game) {
   /* Título */
   mvprintw(1, PANEL_COL, "T E T R I S");
 
-  /* Score */
-  mvprintw(10, PANEL_COL, "Puntuacion:");
-  mvprintw(11, PANEL_COL, "%d", game->score);
+  /* Separador entre piezas y stats */
+  mvprintw(17, PANEL_COL, "------------");
+
+  /* Score — %07d: siempre 7 dígitos con ceros a la izquierda */
+  mvprintw(18, PANEL_COL, "Puntuacion:");
+  mvprintw(19, PANEL_COL, "%07d", game->score);
 
   /* Nivel */
-  mvprintw(13, PANEL_COL, "Nivel:");
-  mvprintw(14, PANEL_COL, "%d", game->level);
+  mvprintw(21, PANEL_COL, "Nivel: %d", game->level);
 
-  /* Líneas */
-  mvprintw(16, PANEL_COL, "Lineas:");
-  mvprintw(17, PANEL_COL, "%d", game->linesCleared);
+  /* Líneas con progreso al siguiente nivel */
+  int progress = game->linesCleared % 10; /* líneas en el nivel actual */
+  mvprintw(23, PANEL_COL, "Lineas: %d", game->linesCleared);
+  mvprintw(24, PANEL_COL, "[");
+  for (int i = 0; i < 10; i++)
+    mvprintw(24, PANEL_COL + 1 + i, i < progress ? "=" : "-");
+  mvprintw(24, PANEL_COL + 11, "]");
+
+  /* Separador */
+  mvprintw(26, PANEL_COL, "------------");
 
   /* Controles */
-  mvprintw(20, PANEL_COL, "Controles:");
-  mvprintw(21, PANEL_COL, "<- -> : mover");
-  mvprintw(22, PANEL_COL, "^    : rotar");
-  mvprintw(23, PANEL_COL, "v    : bajar");
-  mvprintw(24, PANEL_COL, "SPC  : drop");
-  mvprintw(25, PANEL_COL, "c    : hold");
-  mvprintw(26, PANEL_COL, "q    : salir");
+  mvprintw(27, PANEL_COL, "Controles:");
+  mvprintw(28, PANEL_COL, "<-/a ->/ d");
+  mvprintw(29, PANEL_COL, "^/w  v/s");
+  mvprintw(30, PANEL_COL, "SPC:drop c:hold");
+  mvprintw(31, PANEL_COL, "q:salir");
 
   attroff(COLOR_PAIR(COLOR_PAIR_TEXT));
 
   DrawNextPiece(game);
+  DrawHoldPiece(game);
 }
 
 static void GameOver(TetrisGame *game) {
@@ -229,12 +294,20 @@ static TetrisMove ReadInput(void) {
 
   switch (ch) {
   case KEY_LEFT:
+  case 'a':
+  case 'A':
     return MOVE_LEFT;
   case KEY_RIGHT:
+  case 'd':
+  case 'D':
     return MOVE_RIGHT;
   case KEY_DOWN:
+  case 's':
+  case 'S':
     return MOVE_DOWN;
   case KEY_UP:
+  case 'w':
+  case 'W':
     return MOVE_ROTATE;
   case ' ':
     return MOVE_DROP;
@@ -246,44 +319,46 @@ static TetrisMove ReadInput(void) {
     return MOVE_QUIT;
   default:
     return MOVE_NONE;
-}}
+  }
+}
 
-static void DrawFrame(TetrisGame *game){
-    clear();
-    DrawBorder();
-    DrawBoard(game);
-    DrawPiece(game, &game->current, BOARD_ORIGIN_ROW, BOARD_ORIGIN_COL);
-    DrawPanel(game);
-    refresh();
+static void DrawFrame(TetrisGame *game) {
+  clear();
+  DrawBorder();
+  DrawBoard(game);
+  DrawPiece(game, &game->current, BOARD_ORIGIN_ROW, BOARD_ORIGIN_COL);
+  DrawPanel(game);
+  refresh();
 }
 
 // Main Function
-int main(void){
-    TetrisGame game;
+int main(void) {
+  TetrisGame game;
 
-    InitCurses();
+  InitCurses();
 
-    TetrisGameInit(&game);
+  TetrisGameInit(&game);
 
-    // Game Loop
-    bool running = true;
+  // Game Loop
+  bool running = true;
 
-    while (running) {
-        TetrisMove move = ReadInput();
+  while (running) {
+    TetrisMove move = ReadInput();
 
-        if(move==MOVE_QUIT)break;
+    if (move == MOVE_QUIT)
+      break;
 
-        running= TetrisGameTick(&game, move);
+    running = TetrisGameTick(&game, move);
 
-        DrawFrame(&game);
-    }
+    DrawFrame(&game);
+  }
 
-    if(game.gameOver){
-        DrawFrame(&game);
-        GameOver(&game);
-    }
+  if (game.gameOver) {
+    DrawFrame(&game);
+    GameOver(&game);
+  }
 
-    endwin();
+  endwin();
 
-    return 0;
+  return 0;
 }
