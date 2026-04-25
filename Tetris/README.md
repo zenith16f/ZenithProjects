@@ -66,13 +66,12 @@ Game logic and rendering are completely decoupled — `tetris.c` knows nothing a
 
 ## ✅ What's done so far
 
-### Version 1.5
+### Version 2.0
 
-- Tiling Manager Problem solved
-- Blocked the mouse when playing
-- Improved Scoring system
-- Arra-Based Gravity
-- Hold piece panel
+- Ghost Piece
+- Lock Delay
+- Hold piece panel details
+- UI small improves
 
 ------
 
