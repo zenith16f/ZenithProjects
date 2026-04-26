@@ -1,0 +1,225 @@
+/*  GOOGLE FONTS */
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap");
+
+/*  RESET */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  cursor: url(../assets/cursor/pointer.svg), auto;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  overflow-x: hidden;
+  /* cursor: url(/assets/cursor/paw.svg), auto; */
+}
+
+img,
+video {
+  max-width: 100%;
+  display: block;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* ------------------------------------------------------------
+  DESIGN TOKENS — CSS CUSTOM PROPERTIES
+   ------------------------------------------------------------ */
+:root {
+  /* Fondos */
+  --bg-base: #080f0c;
+  --bg-surface: #0a120e;
+  --bg-card: #0d1a14;
+  --bg-card-active: #0f2318;
+
+  /* Verde esmeralda — color principal */
+  --purple-400: #5dbe8a;
+  --purple-600: #2d8f5f;
+  --purple-800: #1a6642;
+  --purple-light: #8ed4ad;
+  --purple-lighter: #b8e8cc;
+  --purple-lightest: #e2f5eb;
+
+  /* Teal — color de apoyo */
+  --navy-deep: #061410;
+  --navy-border: #132b20;
+  --navy-mid: #1e3d2c;
+  --navy-text: #2e5a40;
+
+  /* Texto */
+  --text-primary: #e0f5ea;
+  --text-secondary: #c0dece;
+
+  /*  Tipografía */
+
+  --font-serif: "Cormorant Garamond", serif;
+
+  --font-sans: "Inter", sans-serif;
+
+  /*  Radios de borde  */
+
+  --radius-card: 14px;
+
+  --radius-small: 8px;
+
+  --radius-pill: 99px;
+
+  /* Bordes reutilizables */
+  --border-default: 0.5px solid var(--navy-mid);
+
+  --border-accent: 1.5px solid var(--purple-400);
+
+  /*  Transiciones  */
+
+  --transition-fast: 150ms ease;
+
+  --transition-base: 300ms ease;
+
+  --transition-slow: 600ms ease;
+}
+
+/* ------------------------------------------------------------
+   TIPOGRAFÍA BASE
+   ------------------------------------------------------------ */
+
+.t-serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+
+.t-serif-italic {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.t-label {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--purple-400);
+}
+
+.t-body {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.t-hint {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--navy-text);
+}
+.t-hint-message {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* ------------------------------------------------------------
+   UTILIDADES MÍNIMAS
+   ------------------------------------------------------------ */
+
+.container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.js-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.divider__line {
+  width: 36px;
+  height: 0.5px;
+  background: var(--purple-600);
+}
+
+.divider__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--purple-400);
+}
+
+/* ------------------------------------------------------------
+   SCROLLBAR PERSONALIZADO
+   ------------------------------------------------------------ */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--purple-800);
+  border-radius: var(--radius-pill);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--purple-800) var(--bg-base);
+}

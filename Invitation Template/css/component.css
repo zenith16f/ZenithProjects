@@ -1,0 +1,271 @@
+/* ============================================================
+   COMPONENTS.CSS
+   Estilos visuales de todos los componentes reutilizables:
+   botones, chips, tarjetas, separadores y el countdown.
+
+   Depende de las variables de base.css.
+   No define estructura ni posicionamiento, eso está en layout.css.
+
+   Orden:
+   1. Botones
+   2. Chips / badges
+   3. Separador decorativo (.divider)
+   4. Tarjetas del plan
+   5. Countdown
+   6. Easter egg (tarjeta del mensaje)
+   7. Música (botón flotante)
+   8. Animaciones y keyframes
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   BOTONES
+   ------------------------------------------------------------ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 32px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast),
+    opacity var(--transition-fast);
+
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn--primary {
+  background-color: var(--purple-600);
+  color: var(--purple-lightest);
+  border: 1.5px solid var(--purple-600);
+}
+
+@media (hover: hover) {
+  .btn--primary:hover {
+    background-color: var(--purple-400);
+    border-color: var(--purple-400);
+  }
+}
+
+.btn--primary:active {
+  transform: scale(0.97);
+}
+
+.btn--ghost {
+  background-color: transparent;
+  color: var(--navy-text);
+  border: var(--border-default);
+}
+
+@media (hover: hover) {
+  .btn--ghost:hover {
+    border-color: var(--navy-border);
+    color: var(--purple-light);
+  }
+}
+
+.btn--ghost.is-fleeing {
+  transition: none;
+}
+
+.btn--ghost.is-shrinking {
+  transform: scale(0.5);
+  opacity: 0.3;
+  transition:
+    transform 200ms ease,
+    opacity 200ms ease;
+}
+
+/* ------------------------------------------------------------
+   CHIPS / BADGES
+   ------------------------------------------------------------ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: var(--border-default);
+
+  gap: 6px;
+}
+
+/* ------------------------------------------------------------
+   SEPARADOR DECORATIVO
+   ------------------------------------------------------------ */
+
+/* Variante morada: usada en el hero */
+.divider--purple .divider__line {
+  background-color: var(--purple-600);
+}
+
+.divider--purple .divider__dot {
+  background-color: var(--purple-400);
+}
+
+.divider--subtle .divider__line {
+  background-color: var(--navy-mid);
+}
+
+.divider--subtle .divider__dot {
+  background-color: var(--navy-border);
+}
+
+/* ------------------------------------------------------------
+   TARJETAS DEL PLAN
+   ------------------------------------------------------------ */
+
+.plan__card {
+  outline: none;
+}
+
+.plan__card:focus-visible {
+  box-shadow: 0 0 0 2px var(--purple-600);
+}
+
+.plan__card-dot {
+  flex-shrink: 0;
+}
+
+/* ------------------------------------------------------------
+   COUNTDOWN
+   ------------------------------------------------------------ */
+
+.countdown__number.is-flipping {
+  animation: flipNumber 400ms ease forwards;
+}
+
+.countdown__unit {
+  perspective: 400px;
+}
+
+/* ------------------------------------------------------------
+   EASTER EGG — tarjeta del mensaje
+   ------------------------------------------------------------ */
+
+.easter-egg__card .t-label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--purple-600);
+}
+
+/* ------------------------------------------------------------
+    MÚSICA — botón flotante
+   ------------------------------------------------------------ */
+
+.music-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 52px;
+  left: 0;
+  background-color: var(--bg-card);
+  border: var(--border-default);
+  border-radius: var(--radius-small);
+  padding: 4px 10px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--purple-light);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .music-btn:hover::after {
+    opacity: 1;
+  }
+}
+
+.music-player {
+  position: fixed;
+}
+
+/* ------------------------------------------------------------
+   ANIMACIONES Y KEYFRAMES
+   ------------------------------------------------------------ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    visibility: hidden;
+  }
+  to {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.anim-fade-in {
+  animation: fadeIn var(--transition-base) ease forwards;
+}
+
+@keyframes flipNumber {
+  0% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+  49% {
+    transform: rotateX(-90deg);
+    opacity: 0;
+  }
+  50% {
+    transform: rotateX(90deg);
+    opacity: 0;
+  }
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: var(--star-opacity, 0.5);
+  }
+  50% {
+    opacity: 0.1;
+  }
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background-color: var(--purple-400);
+  animation: twinkle var(--star-duration, 3s) ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.btn--primary.is-confirmed {
+  animation: pulse 400ms ease forwards;
+  background-color: var(--purple-400);
+  border-color: var(--purple-400);
+  pointer-events: none;
+}
+
+.easter-egg__card:not(.js-hidden) {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
