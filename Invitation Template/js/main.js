@@ -86,7 +86,7 @@ const initStars = () => {
       `${(Math.random() * 3 + 2).toFixed(1)}s`,
     );
     star.style.animationDelay = `${(Math.random() * 3).toFixed(1)}s`;
-    if (Math.random() > 0.6) star.style.backgroundColor = "#AFA9EC";
+    if (Math.random() > 0.6) star.style.backgroundColor = "#8ed4ad";
     fragment.appendChild(star);
   }
 
