@@ -1,8 +1,10 @@
-# 🛠️ ZenithProjects
+# 🛠️ SmallProjects
 
 A personal collection of projects built from scratch to deeply understand core programming concepts — games, systems tools, cryptography, and more.
 
 Inspired by the [build-your-own-x](https://github.com/codecrafters-io/build-your-own-x) repository.
+
+🔗 **Live:** [zenith16f.github.io/SmallProjects](https://zenith16f.github.io/SmallProjects/)
 
 ---
 
